@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { reactive, inject, watchEffect } from 'vue'
 
-const config = reactive({ cards: [{} as any], animate: true, videoEnd: false, videoSrc: '', showResult: false, result: [] as any })
+const config = reactive({
+  cards: [{} as any],
+  animate: true,
+  videoEnd: false,
+  videoSrc: '',
+  showResult: false,
+  result: [] as any,
+  clear: 0,
+})
 const gacha_result = inject('gacha', reactive({ data: [] as any }))
 const characterInfo = JSON.parse(
   localStorage.getItem('characterInfo') as string,
@@ -12,11 +20,17 @@ const prefetch = reactive({ data: [] as any })
 config.cards = []
 
 function next() {
+  if (config.clear === 1) {
+    while (config.cards.length) config.cards.shift()
+    config.animate = true
+    config.showResult = true
+    config.clear = 0
+    return
+  }
   if (config.animate || config.cards.length === 0) return
   config.cards.shift()
   config.animate = true
-  if (config.cards.length === 0)
-    config.showResult = true
+  if (config.cards.length === 0) config.showResult = true
 }
 
 watchEffect(() => {
@@ -26,7 +40,7 @@ watchEffect(() => {
 
   config.videoEnd = false
   let maxStar = 3
-  if (raw == null) return
+  if (raw === null) return
   const zh2en = JSON.parse(raw)
   while (gacha_result.data.length) {
     const data = gacha_result.data.shift() as any
@@ -67,12 +81,12 @@ watchEffect(() => {
       )
     }
   }
-  config.videoSrc = `/video/${maxStar}starwish${draws === 1 ? '-single' : ''}.mp4`
-  console.log(config.result)
+  config.videoSrc = `/video/${maxStar}starwish${
+    draws === 1 ? '-single' : ''
+  }.mp4`
   config.result.sort((x: any, y: any) => {
     if (x.star === y.star) {
-      if (x.up === y.up)
-        return y.result.item_id - x.result.item_id
+      if (x.up === y.up) return y.result.item_id - x.result.item_id
       else return y.up - x.up
     }
     return y.star - x.star
@@ -97,8 +111,23 @@ watchEffect(() => {
       rel="prefetch"
       :href="a"
     />
-    <video v-if="config.videoEnd === false" :src="config.videoSrc" autoplay @ended="config.videoEnd=true" @click="config.videoEnd = true"></video>
-    <div v-if="config.cards.length != 0 && config.videoEnd " class="flex items-center min-h-100vh w-100vw">
+    <video
+      v-if="config.videoEnd === false"
+      :src="config.videoSrc"
+      autoplay
+      @ended="config.videoEnd = true"
+      @click="config.videoEnd = true"
+    ></video>
+    <div
+      v-if="config.cards.length != 0 && config.videoEnd"
+      class="flex items-center min-h-100vh w-100vw"
+    >
+      <p
+        class="fixed top-3 right-5 font-genshin underline cursor-pointer"
+        @click="config.clear = 1"
+      >
+        跳过→
+      </p>
       <div
         class="font-genshin text-5xl absolute ml-15vw animated"
         :class="{ animate__textIn: config.animate }"
@@ -122,6 +151,11 @@ watchEffect(() => {
         @animationend="config.animate = false"
       />
     </div>
-    <GachaResult v-if="config.showResult" :gacha-list="config.result" class="h-100vh" @click="config.showResult=false"></GachaResult>
+    <GachaResult
+      v-if="config.showResult"
+      :gacha-list="config.result"
+      class="h-100vh"
+      @click="config.showResult = false"
+    ></GachaResult>
   </div>
 </template>

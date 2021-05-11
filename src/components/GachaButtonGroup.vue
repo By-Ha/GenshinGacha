@@ -6,14 +6,19 @@ import { gachaOnce, gachaTenimes } from '~/utils/gacha'
 const disAbleGachaBtn = ref(false)
 const gacha_result = inject('gacha', reactive({ data: [] as any }))
 
+function check() {
+  if (localStorage.getItem('gacha') === null || localStorage.getItem('zh2en') === null) return false
+  else return true
+}
+
 function once() {
-  if (disAbleGachaBtn.value) return
+  if (disAbleGachaBtn.value || !check()) return
   disAbleGachaBtn.value = true
   gacha_result.data = gacha_result.data.concat(gachaOnce(301))
   disAbleGachaBtn.value = false
 }
 function tenTimes() {
-  if (disAbleGachaBtn.value) return
+  if (disAbleGachaBtn.value || !check()) return
   disAbleGachaBtn.value = true
   gacha_result.data = gacha_result.data.concat(gachaTenimes(301))
   disAbleGachaBtn.value = false

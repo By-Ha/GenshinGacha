@@ -31,7 +31,7 @@ onMounted(() => {
     <div v-else>
       <img class="character-image" :src="characterImage" alt="ERROR" />
     </div>
-    <div v-if="data.times !== undefined" class="times">
+    <div v-if="data.star !== 3" class="times">
       「{{ data.times }} 抽」
     </div>
   </div>
