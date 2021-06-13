@@ -123,13 +123,13 @@ watchEffect(() => {
       class="flex items-center min-h-100vh w-100vw"
     >
       <p
-        class="fixed top-3 right-5 font-genshin underline cursor-pointer"
+        class="fixed top-3 right-5 font-genshin underline cursor-pointer text-white"
         @click="config.clear = 1"
       >
         跳过→
       </p>
       <div
-        class="font-genshin text-5xl absolute ml-15vw animated"
+        class="font-genshin text-5xl absolute ml-15vw animated text-white"
         :class="{ animate__textIn: config.animate }"
       >
         <img
